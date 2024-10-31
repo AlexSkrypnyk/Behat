@@ -74,8 +74,9 @@ jobs:
           composer config --global --no-plugins allow-plugins.symfony/flex true &&
           composer global require symfony/flex
 
-      - name: Remove vimeo/psalm until it supports PHP 8.4
-        if: matrix.php == '8.4'
+      # until psalm is updated to v5 which is compatible with Symfony 7
+      - name: Remove vimeo/psalm
+        if: matrix.symfony-version == '7.0'
         run: composer remove vimeo/psalm --no-update --dev
 
       - name: Install latest dependencies
@@ -115,7 +116,7 @@ jobs:
         run: composer update
 
       - name: Run Psalm
-        run: ./vendor/bin/psalm --output-format=github || true
+        run: ./vendor/bin/psalm --output-format=github
 
   build-phar:
     name: Build PHAR file
@@ -157,10 +158,6 @@ jobs:
           php-version: "${{ matrix.php }}"
           ini-values: "phar.readonly=0,zend.exception_ignore_args=Off"
           coverage: none
-
-      - name: Remove vimeo/psalm until it supports PHP 8.4
-        if: matrix.php == '8.4'
-        run: composer remove vimeo/psalm --no-update --dev
 
       - name: Install dependencies
         run: composer install
